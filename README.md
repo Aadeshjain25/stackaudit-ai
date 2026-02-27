@@ -1,11 +1,14 @@
-## Project Overview
+# StackAudit AI
 
-StackAudit is a developer tool that automatically audits source code quality.
+StackAudit is an AI-assisted code audit platform designed to review source code quality using real software engineering metrics instead of relying purely on LLM output.
 
-Instead of directly sending raw code to an AI model, the system first performs static code analysis using Abstract Syntax Tree (AST) parsing. It calculates real engineering metrics such as cyclomatic complexity, maintainability score, and production risk score.
+Traditional AI code review tools directly send raw code to an AI model, which often produces hallucinated or unreliable feedback.
 
-These metrics are then optionally interpreted by an AI model to generate a human-readable technical review.
+StackAudit solves this by introducing a two-layer architecture:
 
-The goal of StackAudit is to make AI-generated feedback reliable by combining deterministic code analysis with natural-language reasoning.
+1) Static Analysis Engine → produces factual metrics  
+2) AI Explanation Layer → explains the metrics in natural language
 
-This approach prevents hallucinated feedback and makes the platform suitable for real development workflows.
+The platform parses JavaScript/TypeScript into an Abstract Syntax Tree (AST), computes engineering quality scores, stores analysis history, and generates a professional technical review report.
+
+This makes the feedback measurable, repeatable, and suitable for real development workflows.
