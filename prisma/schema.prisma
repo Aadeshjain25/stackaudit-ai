@@ -1,0 +1,19 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model reports {
+  id                   Int      @id @default(autoincrement())
+  filename             String?
+  functionCount        Int
+  loopCount            Int
+  ifCount              Int
+  complexity           Int
+  maintainabilityScore Int
+  riskScore            Int
+  created_at           DateTime @default(now())
+}
