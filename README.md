@@ -12,3 +12,13 @@ StackAudit solves this by introducing a two-layer architecture:
 The platform parses JavaScript/TypeScript into an Abstract Syntax Tree (AST), computes engineering quality scores, stores analysis history, and generates a professional technical review report.
 
 This makes the feedback measurable, repeatable, and suitable for real development workflows.
+## Key Features
+
+- AST-based static code analysis (Babel parser)
+- Cyclomatic complexity calculation
+- Maintainability score evaluation
+- Production risk scoring
+- PostgreSQL report persistence
+- Historical report tracking
+- Graceful degradation when AI service fails
+- Optional AI technical explanation layer
