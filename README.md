@@ -22,3 +22,30 @@ This makes the feedback measurable, repeatable, and suitable for real developmen
 - Historical report tracking
 - Graceful degradation when AI service fails
 - Optional AI technical explanation layer
+## System Architecture
+
+User Code Input
+        ↓
+Next.js API Endpoint
+        ↓
+AST Parser & Traversal
+        ↓
+Metrics & Scoring Engine
+        ↓
+PostgreSQL Database (Prisma)
+        ↓
+AI Explanation Layer (Optional)
+        ↓
+JSON Report Response
+
+
+## Why StackAudit?
+
+Most AI code review tools rely entirely on LLM reasoning, which can produce inconsistent or hallucinated feedback.
+
+StackAudit separates responsibilities:
+
+Static Analyzer → provides deterministic facts  
+AI Layer → provides readable explanations
+
+This hybrid architecture makes feedback reliable while still user-friendly.
