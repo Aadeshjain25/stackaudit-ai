@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-
+console.log("Gemini key:", process.env.GEMINI_API_KEY);
 export async function generateAIReport(metrics: {
   functionCount: number;
   loopCount: number;
@@ -12,7 +12,7 @@ export async function generateAIReport(metrics: {
 }) {
 
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash"
+    model: "gemini-2.0-flash",
   });
 
   const prompt = `
@@ -28,21 +28,13 @@ Maintainability Score: ${metrics.maintainabilityScore}/100
 Production Risk Score: ${metrics.riskScore}/100
 
 Write a short professional code review including:
-• Overall quality
-• Potential risks
-• Practical improvements
+- Overall quality
+- Potential risks
+- Practical improvements
 Keep it clear and concise.
 `;
 
-  const result = await model.generateContent({
-    contents: [
-      {
-        role: "user",
-        parts: [{ text: prompt }],
-      },
-    ],
-  });
+  const result = await model.generateContent(prompt);
 
-  const response = result.response;
-  return response.text();
+  return result.response.text();
 }

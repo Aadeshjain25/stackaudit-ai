@@ -23,9 +23,9 @@ export async function POST(req: Request) {
 
     try {
       aiExplanation = await generateAIReport(metrics);
-    } catch (err) {
-      console.log("AI temporarily unavailable");
-    }
+    }catch (err) {
+  console.error("AI ERROR:", err);
+}
 
     // Save to DB
     const savedReport = await prisma.reports.create({
