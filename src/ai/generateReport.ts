@@ -1,19 +1,22 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-console.log("Gemini key:", process.env.GEMINI_API_KEY);
-export async function generateAIReport(metrics: {
+type Metrics = {
   functionCount: number;
   loopCount: number;
   ifCount: number;
   complexity: number;
   maintainabilityScore: number;
   riskScore: number;
-}) {
+};
 
-  const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash",
-  });
+export async function generateAIReport(metrics: Metrics) {
+  const apiKey = process.env.GROQ_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("GROQ_API_KEY is not configured.");
+  }
+
+  const groq = new Groq({ apiKey });
 
   const prompt = `
 You are a senior software engineer reviewing a junior developer's code.
@@ -31,10 +34,19 @@ Write a short professional code review including:
 - Overall quality
 - Potential risks
 - Practical improvements
-Keep it clear and concise.
+
+Keep it clear, concise, and professional.
 `;
 
-  const result = await model.generateContent(prompt);
+  const response = await groq.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    messages: [
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+  });
 
-  return result.response.text();
+  return response.choices?.[0]?.message?.content || "No report generated.";
 }

@@ -51,7 +51,7 @@ export function analyzeCode(code: string) {
   if (maintainabilityScore < 0) maintainabilityScore = 0;
 
   // Production Risk Score (higher = worse)
-  let riskScore = Math.min(100, complexity * 5 + loopCount * 5 + ifCount * 3);
+  const riskScore = Math.min(100, complexity * 5 + loopCount * 5 + ifCount * 3);
 
   return {
     functionCount,
