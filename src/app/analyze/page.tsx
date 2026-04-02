@@ -111,9 +111,11 @@ export default function AnalyzePage() {
           onRunAudit={() => void runAudit()}
         />
 
-        <span suppressHydrationWarning>
-  {loadingMessages[loadingIndex]}
-</span> 
+        {isLoading && (
+  <span suppressHydrationWarning>
+    {loadingMessages?.[loadingIndex] ?? ""}
+  </span>
+)}
 
         {showErrorState && !isLoading ? (
           <AnalyzeErrorState
