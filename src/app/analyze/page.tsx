@@ -113,7 +113,7 @@ export default function AnalyzePage() {
 
         <span suppressHydrationWarning>
   {loadingMessages[loadingIndex]}
-</span>
+</span> 
 
         {showErrorState && !isLoading ? (
           <AnalyzeErrorState
