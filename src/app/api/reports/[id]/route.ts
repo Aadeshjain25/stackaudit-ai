@@ -1,0 +1,48 @@
+import { NextResponse } from "next/server";
+import { getReportById } from "@/src/services/reportService";
+
+type Params = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function GET(_request: Request, { params }: Params) {
+  function successResponse<T>(data: T) {
+    return NextResponse.json({
+      success: true,
+      data,
+    });
+  }
+
+  function errorResponse(status: number, error: string, message: string) {
+    return NextResponse.json(
+      {
+        success: false,
+        error,
+        message,
+      },
+      { status },
+    );
+  }
+
+  try {
+    const { id } = await params;
+    const numericId = Number(id);
+
+    if (!Number.isInteger(numericId) || numericId <= 0) {
+      return errorResponse(404, "NOT_FOUND", "Report not found");
+    }
+
+    const report = await getReportById(numericId);
+
+    if (!report) {
+      return errorResponse(404, "NOT_FOUND", "Report not found");
+    }
+
+    return successResponse(report);
+  } catch (error) {
+    console.error("REPORT DETAIL API ERROR:", error);
+    return errorResponse(500, "SERVER_ERROR", "Something went wrong");
+  }
+}

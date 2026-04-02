@@ -12,6 +12,7 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "tmp/**",
+    ".stackaudit-tmp/**",
     "next-env.d.ts",
   ]),
 ]);

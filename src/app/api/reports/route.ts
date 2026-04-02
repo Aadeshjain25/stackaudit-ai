@@ -1,18 +1,30 @@
-import { prisma } from "../../../lib/prisma";
 import { NextResponse } from "next/server";
+import { listReports } from "@/src/services/reportService";
 
 export async function GET() {
-  try {
-    const reports = await prisma.reports.findMany({
-      orderBy: { id: "desc" },
+  function successResponse<T>(data: T) {
+    return NextResponse.json({
+      success: true,
+      data,
     });
+  }
 
-    return NextResponse.json(reports);
-  } catch (error) {
-    console.error(error);
+  function errorResponse(status: number, error: string, message: string) {
     return NextResponse.json(
-      { message: "Database error" },
-      { status: 500 }
+      {
+        success: false,
+        error,
+        message,
+      },
+      { status },
     );
+  }
+
+  try {
+    const reports = await listReports();
+    return successResponse(reports);
+  } catch (error) {
+    console.error("REPORTS API ERROR:", error);
+    return errorResponse(500, "SERVER_ERROR", "Something went wrong");
   }
 }

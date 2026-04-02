@@ -1,6 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import Navbar from "@/components/Navbar";
+import Navbar from "../components/Navbar";
 import { Inter, Space_Grotesk } from "next/font/google";
 
 export const metadata: Metadata = {
@@ -32,9 +32,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-     <body className={`${inter.variable} ${display.variable} font-sans bg-[#070B14] text-white antialiased`}>
+     <body className={`${inter.variable} ${display.variable} flex min-h-screen flex-col font-sans bg-[#070B14] text-white antialiased`}>
         <Navbar />
-        <main>{children}</main>
+        <main className="flex-1">{children}</main>
       </body>
     </html>
   );
