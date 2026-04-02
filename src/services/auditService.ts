@@ -141,7 +141,7 @@ export async function runAudit(repoUrl: string): Promise<AuditRunResult> {
 
     return {
       ...report,
-      reportId: saved.id,
+      reportId: String(saved.id),
       createdAt: saved.createdAt.toISOString(),
     };
   } finally {

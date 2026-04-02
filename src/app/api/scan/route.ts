@@ -67,6 +67,10 @@ export async function POST(req: Request) {
       return errorResponse(422, "CLONE_TIMEOUT", error.message);
     }
 
-    return errorResponse(500, "SCAN_FAILED", "Something went wrong during analysis.");
+    return errorResponse(
+  500,
+  "SCAN_FAILED",
+  error instanceof Error ? error.message : "Unknown error"
+);
   }
 }
