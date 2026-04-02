@@ -7,7 +7,7 @@ datasource db {
 }
 
 model reports {
-  id             Int      @id @default(autoincrement())
+  id             String   @id @default(uuid()) @db.Uuid
   repoName       String
   repoUrl        String
   techStack      Json
@@ -25,7 +25,7 @@ model reports {
 
 model feedback {
   id        Int      @id @default(autoincrement())
-  reportId  Int
+  reportId  String   @db.Uuid
   rating    String
   message   String?
   createdAt DateTime @default(now())

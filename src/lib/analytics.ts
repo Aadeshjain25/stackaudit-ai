@@ -5,14 +5,14 @@ export function logScan(repoUrl: string) {
   });
 }
 
-export function logReportView(reportId: number) {
+export function logReportView(reportId: string) {
   console.log("[analytics] report_view", {
     reportId,
     timestamp: new Date().toISOString(),
   });
 }
 
-export function logFeedback(reportId: number) {
+export function logFeedback(reportId: string) {
   console.log("[analytics] feedback", {
     reportId,
     timestamp: new Date().toISOString(),

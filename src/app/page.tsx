@@ -64,10 +64,10 @@ export default function Home() {
               </Link>
 
               <Link
-                href="/dashboard"
+                href="/analyze"
                 className="rounded-md border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-[0_8px_28px_rgba(15,23,42,0.35)] backdrop-blur-xl transition duration-700 hover:bg-white/15 hover:text-white hover:shadow-[0_10px_34px_rgba(147,197,253,0.28)]"
               >
-                View Reports -&gt;
+                Start Audit -&gt;
               </Link>
             </div>
           </div>

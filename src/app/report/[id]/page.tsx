@@ -12,7 +12,7 @@ import {
   getRiskyFiles,
   getTopIssuesSummary,
 } from "@/src/lib/reportInsights";
-import { getReportById } from "@/src/services/reportService";
+import { getReportById, isValidReportId } from "@/src/services/reportService";
 
 type PageProps = {
   params: Promise<{
@@ -36,7 +36,20 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ShareableReportPage({ params }: PageProps) {
   const { id } = await params;
-  const report = await getReportById(Number(id));
+
+  if (!isValidReportId(id)) {
+    return (
+      <main className="page-shell">
+        <div className="page-grid">
+          <Reveal className="surface px-6 py-12 text-center sm:px-8">
+            Report not found. Try another shared link or analyze a repository first.
+          </Reveal>
+        </div>
+      </main>
+    );
+  }
+
+  const report = await getReportById(id);
 
   if (!report) {
     return (
@@ -50,7 +63,7 @@ export default async function ShareableReportPage({ params }: PageProps) {
     );
   }
 
-  logReportView(report.reportId ?? Number(id));
+  logReportView(report.reportId ?? id);
 
   const keyInsight = getKeyInsight(report);
   const topIssues = getTopIssuesSummary(report, 5);

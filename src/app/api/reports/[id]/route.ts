@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getReportById } from "@/src/services/reportService";
+import { getReportById, isValidReportId } from "@/src/services/reportService";
 
 type Params = {
   params: Promise<{
@@ -28,13 +28,12 @@ export async function GET(_request: Request, { params }: Params) {
 
   try {
     const { id } = await params;
-    const numericId = Number(id);
 
-    if (!Number.isInteger(numericId) || numericId <= 0) {
+    if (!isValidReportId(id)) {
       return errorResponse(404, "NOT_FOUND", "Report not found");
     }
 
-    const report = await getReportById(numericId);
+    const report = await getReportById(id);
 
     if (!report) {
       return errorResponse(404, "NOT_FOUND", "Report not found");

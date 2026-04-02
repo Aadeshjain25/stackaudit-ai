@@ -1,15 +1,16 @@
 import { NextResponse } from "next/server";
 import { logFeedback } from "@/src/lib/analytics";
 import { getPrisma } from "@/src/lib/prisma";
+import { isValidReportId } from "@/src/services/reportService";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const reportId = Number(body?.reportId);
+    const reportId = typeof body?.reportId === "string" ? body.reportId : "";
     const rating = body?.rating;
     const message = typeof body?.message === "string" ? body.message.trim() : null;
 
-    if (!Number.isFinite(reportId) || (rating !== "yes" && rating !== "no")) {
+    if (!isValidReportId(reportId) || (rating !== "yes" && rating !== "no")) {
       return NextResponse.json(
         {
           success: false,
@@ -30,8 +31,8 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           success: false,
-          error: "INVALID_INPUT",
-          message: "Report not found.",
+          error: "NOT_FOUND",
+          message: "Report not found",
         },
         { status: 404 },
       );

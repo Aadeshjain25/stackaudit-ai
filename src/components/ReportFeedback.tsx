@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 type ReportFeedbackProps = {
-  reportId?: number;
+  reportId?: string;
   repoName: string;
 };
 
@@ -16,7 +16,7 @@ type StoredFeedback = {
   savedAt: string;
 };
 
-function storageKey(reportId: number | undefined, repoName: string) {
+function storageKey(reportId: string | undefined, repoName: string) {
   return `stackaudit-feedback:${reportId ?? repoName}`;
 }
 
@@ -75,7 +75,7 @@ export default function ReportFeedback({ reportId, repoName }: ReportFeedbackPro
         }
 
         const data = (await response.json()) as
-          | { success: true; data: { reportId: number; saved: boolean } }
+          | { success: true; data: { reportId: string; saved: boolean } }
           | { success: false; error: string; message: string };
 
         if (!("success" in data) || data.success !== true) {

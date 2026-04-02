@@ -63,7 +63,7 @@ export type AuditScore = {
 };
 
 export type AuditRunResult = {
-  reportId?: number;
+  reportId?: string;
   repoName: string;
   repoUrl: string;
   techStack: TechStack[];
@@ -83,6 +83,7 @@ export type UnsupportedRepoErrorResponse = {
 };
 
 export type AuditApiErrorCode =
+  | "DISABLED"
   | "CLONE_TIMEOUT"
   | "FEEDBACK_FAILED"
   | "INVALID_INPUT"
@@ -106,7 +107,7 @@ export type ApiSuccessResponse<T> = {
 };
 
 export type ReportListItem = {
-  id: number;
+  id: string;
   repoName: string;
   repoUrl: string;
   score: number;

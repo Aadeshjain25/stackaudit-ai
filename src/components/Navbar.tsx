@@ -9,7 +9,6 @@ import { FaXTwitter } from "react-icons/fa6";
 const navItems = [
   { href: "/", label: "Home" },
   { href: "/analyze", label: "Analyze" },
-  { href: "/dashboard", label: "Dashboard" },
 ];
 
 const creatorUrl = "https://www.linkedin.com/in/aadeshjain25/";

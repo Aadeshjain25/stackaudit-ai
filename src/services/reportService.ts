@@ -2,6 +2,39 @@ import type { reports } from "@prisma/client";
 import { getPrisma } from "@/src/lib/prisma";
 import type { AuditRunResult, ReportListItem } from "@/src/types/audit";
 
+const publicReportSelect = {
+  id: true,
+  repoName: true,
+  repoUrl: true,
+  techStack: true,
+  summaryMetrics: true,
+  fileFindings: true,
+  topIssues: true,
+  score: true,
+  scoreGrade: true,
+  scoreBreakdown: true,
+  aiReport: true,
+  warnings: true,
+  createdAt: true,
+} as const;
+
+type PublicReportRecord = Pick<
+  reports,
+  | "id"
+  | "repoName"
+  | "repoUrl"
+  | "techStack"
+  | "summaryMetrics"
+  | "fileFindings"
+  | "topIssues"
+  | "score"
+  | "scoreGrade"
+  | "scoreBreakdown"
+  | "aiReport"
+  | "warnings"
+  | "createdAt"
+>;
+
 function serializeReport(report: AuditRunResult) {
   return {
     repoName: report.repoName,
@@ -21,7 +54,7 @@ function serializeReport(report: AuditRunResult) {
   };
 }
 
-function hydrateReport(record: reports): AuditRunResult {
+function hydrateReport(record: PublicReportRecord): AuditRunResult {
   const storedScore = (record.scoreBreakdown ?? {}) as Record<string, unknown>;
 
   return {
@@ -76,10 +109,15 @@ export async function listReports(): Promise<ReportListItem[]> {
   }));
 }
 
-export async function getReportById(id: number) {
+export function isValidReportId(id: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+}
+
+export async function getReportById(id: string) {
   const prisma = getPrisma();
   const report = await prisma.reports.findUnique({
     where: { id },
+    select: publicReportSelect,
   });
 
   if (!report) {

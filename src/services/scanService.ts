@@ -1,4 +1,3 @@
-import type { Dirent } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { TechStack } from "@/src/types/audit";
@@ -58,16 +57,9 @@ export async function scanRepository(repoPath: string): Promise<ScanResult> {
 
   async function walk(currentPath: string) {
     assertWithinLimits();
-    let entries: Dirent[] = [];
+    const entries = await readDirectoryEntries(currentPath, repoPath, warnings);
 
-    try {
-      entries = await fs.readdir(currentPath, { withFileTypes: true });
-    } catch (error) {
-      warnings.push(
-        `Skipped ${normalizeRelativePath(path.relative(repoPath, currentPath)) || "."}: ${
-          error instanceof Error ? error.message : "Unable to read directory"
-        }`,
-      );
+    if (!entries) {
       return;
     }
 
@@ -77,7 +69,7 @@ export async function scanRepository(repoPath: string): Promise<ScanResult> {
       const entryPath = path.join(currentPath, entry.name);
 
       if (entry.isDirectory()) {
-        if (IGNORED_DIRECTORIES.has(entry.name)) {
+        if (shouldIgnoreDirectory(entry.name)) {
           continue;
         }
 
@@ -85,13 +77,13 @@ export async function scanRepository(repoPath: string): Promise<ScanResult> {
         continue;
       }
 
-      if (entry.name === "package.json") {
+      if (isPackageManifest(entry.name)) {
         packageJsonDetected = true;
       }
 
       const extension = path.extname(entry.name);
 
-      if (!CODE_EXTENSIONS.has(extension)) {
+      if (!isSupportedCodeExtension(extension)) {
         continue;
       }
 
@@ -99,24 +91,15 @@ export async function scanRepository(repoPath: string): Promise<ScanResult> {
         throw new RepoTooLargeError();
       }
 
-      let stats: Awaited<ReturnType<typeof fs.stat>>;
+      const stats = await readFileStats(entryPath, repoPath, warnings);
 
-      try {
-        stats = await fs.stat(entryPath);
-      } catch (error) {
-        warnings.push(
-          `Skipped ${normalizeRelativePath(path.relative(repoPath, entryPath))}: ${
-            error instanceof Error ? error.message : "Unable to read file metadata"
-          }`,
-        );
+      if (!stats) {
         filesSkipped += 1;
         continue;
       }
 
       if (stats.size > MAX_FILE_SIZE_BYTES) {
-        warnings.push(
-          `Skipped ${normalizeRelativePath(path.relative(repoPath, entryPath))} because it exceeds ${MAX_FILE_SIZE_BYTES / 1000} KB.`,
-        );
+        warnings.push(createOversizedFileWarning(entryPath, repoPath));
         continue;
       }
 
@@ -126,23 +109,7 @@ export async function scanRepository(repoPath: string): Promise<ScanResult> {
         fileSizeBytes: stats.size,
       });
 
-      if (extension === ".js") {
-        detectedStack.add("javascript");
-      }
-
-      if (extension === ".ts") {
-        detectedStack.add("typescript");
-      }
-
-      if (extension === ".jsx") {
-        detectedStack.add("javascript");
-        detectedStack.add("react");
-      }
-
-      if (extension === ".tsx") {
-        detectedStack.add("typescript");
-        detectedStack.add("react");
-      }
+      registerTechStack(extension, detectedStack);
     }
   }
 
@@ -158,4 +125,73 @@ export async function scanRepository(repoPath: string): Promise<ScanResult> {
     warnings,
     filesSkipped,
   };
+}
+
+async function readDirectoryEntries(
+  currentPath: string,
+  repoPath: string,
+  warnings: string[],
+) {
+  try {
+    return await fs.readdir(currentPath, { withFileTypes: true });
+  } catch (error) {
+    warnings.push(
+      `Skipped ${normalizeRelativePath(path.relative(repoPath, currentPath)) || "."}: ${
+        error instanceof Error ? error.message : "Unable to read directory"
+      }`,
+    );
+    return null;
+  }
+}
+
+async function readFileStats(entryPath: string, repoPath: string, warnings: string[]) {
+  try {
+    return await fs.stat(entryPath);
+  } catch (error) {
+    warnings.push(
+      `Skipped ${normalizeRelativePath(path.relative(repoPath, entryPath))}: ${
+        error instanceof Error ? error.message : "Unable to read file metadata"
+      }`,
+    );
+    return null;
+  }
+}
+
+function shouldIgnoreDirectory(name: string) {
+  return IGNORED_DIRECTORIES.has(name);
+}
+
+function isPackageManifest(name: string) {
+  return name === "package.json";
+}
+
+function isSupportedCodeExtension(extension: string) {
+  return CODE_EXTENSIONS.has(extension);
+}
+
+function createOversizedFileWarning(entryPath: string, repoPath: string) {
+  return `Skipped ${normalizeRelativePath(path.relative(repoPath, entryPath))} because it exceeds ${MAX_FILE_SIZE_BYTES / 1000} KB.`;
+}
+
+function registerTechStack(extension: string, detectedStack: Set<TechStack>) {
+  if (extension === ".js") {
+    detectedStack.add("javascript");
+    return;
+  }
+
+  if (extension === ".ts") {
+    detectedStack.add("typescript");
+    return;
+  }
+
+  if (extension === ".jsx") {
+    detectedStack.add("javascript");
+    detectedStack.add("react");
+    return;
+  }
+
+  if (extension === ".tsx") {
+    detectedStack.add("typescript");
+    detectedStack.add("react");
+  }
 }
