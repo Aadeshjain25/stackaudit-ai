@@ -3,8 +3,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
 
-const TMP_ROOT = path.join(process.cwd(), ".stackaudit-tmp", "audits");
-const CLONE_TIMEOUT_MS = 15_000;
+const TMP_ROOT = path.join("/tmp", ".stackaudit-tmp", "audits");
+const CLONE_TIMEOUT_MS = 60_000;
 const execFileAsync = promisify(execFile);
 
 export class CloneTimeoutError extends Error {
