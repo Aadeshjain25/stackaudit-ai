@@ -15,6 +15,7 @@
         "@google/generative-ai": "^0.24.1",
         "@prisma/adapter-pg": "^7.4.1",
         "@prisma/client": "^7.4.1",
+        "adm-zip": "^0.5.17",
         "framer-motion": "^12.38.0",
         "groq-sdk": "^0.37.0",
         "lucide-react": "^0.575.0",
@@ -29,6 +30,7 @@
     },
     "devDependencies": {
         "@tailwindcss/postcss": "^4",
+        "@types/adm-zip": "^0.5.8",
         "@types/babel__traverse": "^7.28.0",
         "@types/node": "^20",
         "@types/react": "^19",
