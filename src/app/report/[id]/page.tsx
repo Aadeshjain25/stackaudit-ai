@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { ArrowRight, BrainCircuit, FolderKanban, Gauge, Sparkles, TriangleAlert } from "lucide-react";
 import CopyReportLinkButton from "@/src/components/CopyReportLinkButton";
@@ -12,13 +13,15 @@ import {
   getRiskyFiles,
   getTopIssuesSummary,
 } from "@/src/lib/reportInsights";
-import { getReportById, isValidReportId } from "@/src/services/reportService";
+import type { ApiSuccessResponse, AuditApiErrorResponse, AuditRunResult } from "@/src/types/audit";
 
 type PageProps = {
   params: Promise<{
     id: string;
   }>;
 };
+
+export const dynamic = "force-dynamic";
 
 const metricItems = [
   { key: "filesAnalyzed", label: "Files", icon: FolderKanban },
@@ -32,6 +35,46 @@ export async function generateMetadata(): Promise<Metadata> {
     title: "StackAudit Report – Code Health Analysis",
     description: "Analyze GitHub repositories and get code health score, risks, and insights.",
   };
+}
+
+function isValidReportId(id: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+}
+
+async function getBaseUrl() {
+  const headerList = await headers();
+  const host = headerList.get("x-forwarded-host") ?? headerList.get("host");
+  const proto = headerList.get("x-forwarded-proto") ?? "http";
+
+  if (!host) {
+    return null;
+  }
+
+  return `${proto}://${host}`;
+}
+
+async function fetchReport(id: string): Promise<AuditRunResult | null> {
+  const baseUrl = await getBaseUrl();
+
+  if (!baseUrl) {
+    return null;
+  }
+
+  const response = await fetch(`${baseUrl}/api/reports/${id}`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const payload = (await response.json()) as ApiSuccessResponse<AuditRunResult> | AuditApiErrorResponse;
+
+  if (!("success" in payload) || payload.success !== true) {
+    return null;
+  }
+
+  return payload.data;
 }
 
 export default async function ShareableReportPage({ params }: PageProps) {
@@ -49,7 +92,7 @@ export default async function ShareableReportPage({ params }: PageProps) {
     );
   }
 
-  const report = await getReportById(id);
+  const report = await fetchReport(id);
 
   if (!report) {
     return (
