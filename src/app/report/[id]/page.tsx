@@ -10,6 +10,7 @@ import { logReportView } from "@/src/lib/analytics";
 import {
   getImprovementActions,
   getKeyInsight,
+  getReadableContext,
   getRiskyFiles,
   getTopIssuesSummary,
 } from "@/src/lib/reportInsights";
@@ -112,6 +113,7 @@ export default async function ShareableReportPage({ params }: PageProps) {
   const topIssues = getTopIssuesSummary(report, 5);
   const riskyFiles = getRiskyFiles(report, 5);
   const improvementActions = getImprovementActions(report);
+  const readableContext = getReadableContext(report);
   const riskValue =
     report.summaryMetrics.riskDistribution.high + report.summaryMetrics.riskDistribution.critical;
 
@@ -207,6 +209,57 @@ export default async function ShareableReportPage({ params }: PageProps) {
               <p className="py-4 text-sm text-slate-300">No high-risk files found.</p>
             )}
           </div>
+        </Reveal>
+
+        <Reveal className="surface px-6 py-7 sm:px-8" delay={0.26}>
+          <span className="window-ornament" aria-hidden="true" />
+          <h2 className="section-title">Readable context</h2>
+
+          <h3 className="mt-5 text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+            Executive summary
+          </h3>
+          <p className="section-copy mt-3">{readableContext.executiveSummary}</p>
+
+          <h3 className="mt-6 text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+            Most important engineering risks
+          </h3>
+          <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-300">
+            {readableContext.engineeringRisks.map((risk) => (
+              <li key={risk} className="flex gap-2">
+                <span className="text-slate-400" aria-hidden="true">
+                  •
+                </span>
+                <span>{risk}</span>
+              </li>
+            ))}
+          </ul>
+
+          {riskyFiles.length > 0 ? (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {riskyFiles.map((file) => (
+                <span
+                  key={file.filePath}
+                  className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-200"
+                >
+                  {file.filePath}
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          <h3 className="mt-6 text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+            Most practical next fixes
+          </h3>
+          <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-300">
+            {readableContext.practicalNextFixes.map((fix) => (
+              <li key={fix} className="flex gap-2">
+                <span className="text-slate-400" aria-hidden="true">
+                  •
+                </span>
+                <span>{fix}</span>
+              </li>
+            ))}
+          </ul>
         </Reveal>
 
         <Reveal className="surface px-6 py-7 sm:px-8" delay={0.28}>
